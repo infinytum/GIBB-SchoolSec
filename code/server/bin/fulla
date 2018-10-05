@@ -10,6 +10,7 @@ use DBI;
 
 use Fulla::Werchzueg;
 use Fulla::CommandDispatcher;
+use Fulla::Dos;
 
 # basic help message for -h and --help
 if (defined $ARGV[0] and $ARGV[0] =~ /^-h$|^--help$/) {
@@ -112,6 +113,9 @@ $SIG{TERM}  = sub { $log->info('I got killed')   if $log;
                     $continue = 0;
                   };
 
+# any incoming IP must have had at least one second pause
+my $dos = Fulla::Dos->new(1);
+
 # endless loop, looking for client requests
 while($continue)
 {
@@ -127,7 +131,16 @@ while($continue)
     my $client_address = $client_socket->peerhost();
     my $client_port    = $client_socket->peerport();
     $log->info("connection from $client_address:$client_port");
- 
+
+    # don't answer dos attacks
+    if ($dos->check($client_address)) {
+		$log->warn("client blocked: $client_address:$client_port");
+        print $client_socket
+            "00000000000000000000 dos from $client_address";
+        shutdown($client_socket, 1);
+        next;
+	}
+
     # read up to 1024 characters from the connected client
     my $client_data = '';
     sysread( $client_socket, $client_data, 1024);
