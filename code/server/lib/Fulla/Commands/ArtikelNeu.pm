@@ -3,16 +3,14 @@ package Fulla::Commands::ArtikelNeu;
 use v5.22;
 use warnings;
 
+use Function::Parameters 'method';
+
 use Fulla::Werchzueg;
 
-sub reply {
-    my $class   = shift;
-    my $artikel = shift;
-    my $bestand = shift;
-    my $preis   = shift;
-    my $log     = Fulla::Werchzueg->get_logger();
-    my $dbh     = Fulla::Werchzueg->get_database();
+method reply ( $artikel, $bestand, $preis ) {
 
+    my $log    = Fulla::Werchzueg->get_logger();
+    my $dbh    = Fulla::Werchzueg->get_database();
     my $answer = '';
 
     my $sql = "INSERT INTO artikel (bezeichnung, bestand, preis) VALUES (?, ?, ?)";

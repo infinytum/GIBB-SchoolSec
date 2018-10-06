@@ -2,8 +2,9 @@ package Fulla::CommandDispatcher;
 
 use v5.22;
 use warnings;
-no warnings 'experimental'; # disable warnings from given/when
+no warnings 'experimental::smartmatch'; # disbale warnings for given/when
 
+use Function::Parameters 'method';
 use DBI; # with DBD::mysql
 
 use Fulla::Auth;
@@ -18,35 +19,25 @@ use Fulla::Commands::ArtikelNeu;
 use Fulla::Commands::ArtikelLoeschen;
 use Fulla::Commands::HTTP::Artikel;
 
+my ($log, $auth, $dos);
+
 # constructor method for object
-sub new {
-    my $class = shift;
+method new () {
+    $log  = Fulla::Werchzueg->get_logger();
+    $auth = Fulla::Auth->new();
+    $dos  = Fulla::Dos ->new(min_pause => 2);
 
-    my $log   = Fulla::Werchzueg->get_logger();
-    my $dbh   = Fulla::Werchzueg->get_database();
-    my $auth  = Fulla::Auth->new();
-    my $dos   = Fulla::Dos->new(2);
-
-    my $self = { log  => $log,
-                 dbh  => $dbh,
-                 auth => $auth,
-                 dos  => $dos,
-               };
-    bless $self, $class;
-
-    return $self;
+    bless {}, $self;
 }
 
 # take a request
 # check authentication
 # dispatch to module, according to command
-sub do {
-    my $self    = shift;
-    my $command = shift;
+method do ($command) {
 
     my $answer  = '';
 
-    $self->{log}->debug( "command: $command");
+    $log->debug( "command: $command");
 
     # anything which looks like HTTP is directly forwarded
     # this bypasses the Auth/Login machanism, so only read-services of
@@ -56,12 +47,12 @@ sub do {
     }
 
     # check if request is authenticated
-    my ($session, $auth_msg) = $self->{auth}->check($command);
+    my ($session, $auth_msg) = $auth->check($command);
 
-    $self->{log}->debug( "session after auth: $session");
+    $log->debug( "session after auth: $session");
 
     if ( $session eq '00000000000000000000' ) {
-        $self->{log}->info("auth problem: $auth_msg");
+        $log->info("auth problem: $auth_msg");
         $answer = "00000000000000000000 $auth_msg";
         # EXIT
         return $answer;
@@ -71,13 +62,13 @@ sub do {
     # From here on only authorised messages are processed #
     #######################################################
 
-    if ($self->{dos}->check($session)) {
+    if ($dos->check($session)) {
         $answer = "00000000000000000000 too many requests";
         # EXIT
         return $answer;
     }
 
-    $self->{log}->debug( "command before parse: $command");
+    $log->debug( "command before parse: $command");
 
     # does the request look like a valid command?
     if ($command =~ /^\d+\s(.*)/) {
@@ -85,7 +76,7 @@ sub do {
         # extract the command (delete session-id from string)
         $command = $1;
 
-        $self->{log}->debug( "command in parse: $command" );
+        $log->debug( "command in parse: $command" );
 
         # choose a module, if the command is known
         # directly process the command ans store result in $answer

@@ -3,24 +3,20 @@ package Fulla::Dos;
 use v5.22;
 use warnings;
 
-# constructor method for object
-sub new {
-    my $class = shift;
-    my $min_pause_in_seconds = shift;
+use Function::Parameters 'method';
 
-    my $self = { dos_list => {},
-                 pause    => $min_pause_in_seconds,
+# constructor method for object
+method new ( :$min_pause ) {
+
+    my $args = { dos_list => {},
+                 pause    => $min_pause,
                };
 
-    bless $self, $class;
-
-    return $self;
+    bless $args, $self;
 }
 
 # check a client request for authorisation
-sub check {
-    my $self = shift;
-    my $id   = shift;
+method check ($id) {
 
     # DOS-Überprüfung im Server-Loop
     my $current_time = time();

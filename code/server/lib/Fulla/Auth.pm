@@ -3,32 +3,30 @@ package Fulla::Auth;
 use v5.22;
 use warnings;
 
+use Function::Parameters 'method';
 use DBI; # with DBD::mysql
 use Digest;
 use Digest::MD5;
 use String::Random;
 
+my $log;
+my $dbh;
+
 # constructor method for object
-sub new {
-    my $class = shift;
+method new () {
 
-    my $log   = Fulla::Werchzueg->get_logger();
-    my $dbh   = Fulla::Werchzueg->get_database();
+    $log = Fulla::Werchzueg->get_logger();
+    $dbh = Fulla::Werchzueg->get_database();
 
-    my $self = { log        => $log,
-                 dbh        => $dbh,
-                 SESSION    => {},
-                 AUTH_MSG   => '',
-               };
-    bless $self, $class;
+    my $attr= { SESSION  => {},
+                AUTH_MSG => '',
+              };
 
-    return $self;
+    bless $attr, $self;
 }
 
 # check a client request for authorisation
-sub check {
-    my $self    = shift;
-    my $command = shift;
+method check ($command) {
 
     # enter here if user demands a new login
     if ( $command =~ /^\d*\slogin\s(.+)\s(\S+)$/) { 
@@ -42,9 +40,9 @@ sub check {
 
         # https://www.w3schools.com/sql/sql_injection.asp
         my $sql = "SELECT id FROM user WHERE name = '$user' and pw_hash = '$hash_client'";
-        $self->{log}->debug("QUERY: $sql");
+        $log->debug("QUERY: $sql");
 
-        my $sth = $self->{dbh}->prepare($sql);
+        my $sth = $dbh->prepare($sql);
         $sth->execute();
         my ($user_id) = $sth->fetchrow_array();
 
@@ -83,7 +81,7 @@ sub check {
 
             # AUTHORISATION FAILED
             # return zero to caller
-            $self->{log}->info("session not valid: $session_id");
+            $log->info("session not valid: $session_id");
             return ( '00000000000000000000', 'session not valid' );
         }
     }

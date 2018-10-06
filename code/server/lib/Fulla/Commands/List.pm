@@ -3,9 +3,9 @@ package Fulla::Commands::List;
 use v5.22;
 use warnings;
 
-sub reply {
-    my $class  = shift;
-    my $option = shift;
+use Function::Parameters 'method';
+
+method reply ( $option ) {
 
     return `ls $option`;
 

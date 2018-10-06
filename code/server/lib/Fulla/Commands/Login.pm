@@ -3,8 +3,9 @@ package Fulla::Commands::Login;
 use v5.22;
 use warnings;
 
-sub reply {
-    my $class = shift;
+use Function::Parameters 'method';
+
+method reply ( ) {
 
     return 'Hallo!';
 }

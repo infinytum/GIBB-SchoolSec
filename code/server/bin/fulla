@@ -114,7 +114,7 @@ $SIG{TERM}  = sub { $log->info('I got killed')   if $log;
                   };
 
 # any incoming IP must have had at least one second pause
-my $dos = Fulla::Dos->new(1);
+my $dos = Fulla::Dos->new(min_pause => 1);
 
 # endless loop, looking for client requests
 while($continue)

@@ -3,14 +3,14 @@ package Fulla::Commands::ArtikelLoeschen;
 use v5.22;
 use warnings;
 
+use Function::Parameters 'method';
+
 use Fulla::Werchzueg;
 
-sub reply {
-    my $class  = shift;
-    my $art_id = shift;
+method reply ( $art_id ) {
+
     my $log    = Fulla::Werchzueg->get_logger();
     my $dbh    = Fulla::Werchzueg->get_database();
-
     my $answer = '';
 
     my $sql = "DELETE FROM artikel WHERE id = ?;";
