@@ -75,7 +75,7 @@ if ($dbh) {
 }
 else {
     $log->fatal($DBI::errstr);
-    die ($DBI::errstr);
+    die        ($DBI::errstr);
 }
 $dbh->do('set names utf8');
 
@@ -84,7 +84,7 @@ Fulla::Werchzueg->set_database($dbh);
 Fulla::Werchzueg->set_logger  ($log);
 
 # initialise object for parsing and dispatching incoming commands
-my $you = Fulla::CommandDispatcher->new();
+my $dispatcher = Fulla::CommandDispatcher->new();
 
 # configure "auto-flush": no buffering in print to console
 $| = 1;
@@ -96,8 +96,8 @@ my $socket = new IO::Socket::INET (
     Listen        => 5,             # queue size for connections
     Proto         => 'tcp',         # protocol used
 );
-$log->fatal("cannot create socket $!")  unless $socket;
-die         "cannot create socket $!\n" unless $socket;
+$log->fatal("cannot create socket $!") unless $socket;
+die         "cannot create socket $!"  unless $socket;
 $log->info('server waiting for client connection on port 7777');
 
 # this variable controls the main loop of the process
@@ -123,8 +123,8 @@ while($continue)
     my $client_socket = $socket->accept();
 
     unless ($client_socket) {
-        $log->fatal("socket accept failed $!");
-        exit 0;
+        $log->error("socket accept failed $!");
+        next;
     }
  
     # get information about a newly connected client
@@ -135,8 +135,7 @@ while($continue)
     # don't answer dos attacks
     if ($dos->check($client_address)) {
 		$log->warn("client blocked: $client_address:$client_port");
-        print $client_socket
-            "00000000000000000000 dos from $client_address";
+        print $client_socket "00000000000000000000 dos from $client_address";
         shutdown($client_socket, 1);
         next;
 	}
@@ -147,7 +146,7 @@ while($continue)
     $log->info("received data: $client_data");
 
     # do whatever needs to be done
-    my $answer = $you->do($client_data);
+    my $answer = $dispatcher->do($client_data);
     $log->debug("answer: $answer");
 
     # write response data to the connected client
@@ -159,7 +158,7 @@ while($continue)
     $log->info("request from $client_address:$client_port answered");
 }
  
-# clean up your room!
+# always clean up your room
 END {
     $log->info('bye bye') if $log;
     $socket->close()      if $socket;
