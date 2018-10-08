@@ -11,7 +11,6 @@ method reply ( $artikel, $bestand, $preis ) {
 
     my $log    = Fulla::Werchzueg->get_logger();
     my $dbh    = Fulla::Werchzueg->get_database();
-    my $answer = '';
 
     my $sql = "INSERT INTO artikel (bezeichnung, bestand, preis) VALUES (?, ?, ?)";
     $log->debug("QUERY: $sql");

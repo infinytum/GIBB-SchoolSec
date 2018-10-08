@@ -11,7 +11,6 @@ method reply ( $art_id ) {
 
     my $log    = Fulla::Werchzueg->get_logger();
     my $dbh    = Fulla::Werchzueg->get_database();
-    my $answer = '';
 
     my $sql = "DELETE FROM artikel WHERE id = ?;";
     $log->debug("QUERY: $sql PARAM: $art_id");

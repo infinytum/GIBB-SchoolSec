@@ -5,7 +5,7 @@ use warnings;
 use IO::Socket::INET;
 use Proc::Daemon;
 
-use Log::Log4perl qw(:easy);
+use Log::Log4perl ':easy';
 use DBI;
 
 use Fulla::Werchzueg;
