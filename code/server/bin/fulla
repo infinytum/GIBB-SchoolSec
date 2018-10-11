@@ -182,13 +182,22 @@ This module is part of the C<Fulla> project.
 
 =head1 SYNOPSIS
 
-To start the server in the terminal, just type
+To start the server in the terminal, just type:
 
  fulla
 
-If you want to save some logs, you can redirect C<stdin> and C<stdout>
 
- fulla &> fulla_logs_$(date +%F).log
+Kill the server via its process id:
+
+ pkill -F /tmp/fulla.pid
+
+Watch the log messages:
+
+ tail -f fulla.*
+
+don't run as daemon (in foreground):
+
+ fulla test
 
 =head1 LIBRARY
 
@@ -196,4 +205,4 @@ All additional server code can be found under the perl namespace C<Fulla>.
 
 =head1 AUTHOR
 
-© Boris Däppen, Biel, 2017
+© Boris Däppen, Biel, 2017 - 2018
