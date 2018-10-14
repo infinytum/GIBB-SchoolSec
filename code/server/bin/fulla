@@ -18,6 +18,15 @@ if (defined $ARGV[0] and $ARGV[0] =~ /^-h$|^--help$/) {
     exit 0;
 }
 
+my $pid_file = 'pid.fulla';
+if ( -f $pid_file ) {
+    say "\n\tcan't start server\n";
+    say "\t'$pid_file' found, server seems to be running already!";
+    say "\tor maybe it crashed earlier?";
+    say "\tsolutions: stop the server or delete the file 'pid.fulla'\n";
+    exit 1;
+}
+
 # are we a daemon? If any argument is given, we DON'T daemonize
 my $i_am_a_daemon = 1;
    $i_am_a_daemon = 0 if defined $ARGV[0];
@@ -28,14 +37,14 @@ if ($i_am_a_daemon) {
     # help the poor souls, in controlling the daemon
     say '';
     say "\tHi, I'm a daemon\n";
-    say "\tkill me:\t\tpkill -F /tmp/fulla.pid";
+    say "\tkill me:\t\tpkill -F $pid_file";
     say "\twatch me:\t\ttail -f fulla.*";
     say "\tdon't run me as daemon:\tfulla test";
     say '';
 
     # daemonize process
-    $daemon = Proc::Daemon->new( work_dir     => "$ENV{PWD}",
-                                 pid_file     => "/tmp/fulla.pid",
+    $daemon = Proc::Daemon->new( work_dir     => $ENV{PWD},
+                                 pid_file     => $pid_file,
                                  child_STDOUT => 'fulla.stdout',
                                  child_STDERR => 'fulla.stderr',
                                );
@@ -164,7 +173,7 @@ while($continue)
 END {
     $log->info('bye bye')   if $log;
     $socket->close()        if $socket;
-    unlink '/tmp/fulla.pid' if ($daemonized);
+    unlink $pid_file        if ($daemonized);
 }
 
 # Some helpfull links on how to write a TCP application #
