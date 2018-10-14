@@ -23,6 +23,7 @@ my $i_am_a_daemon = 1;
    $i_am_a_daemon = 0 if defined $ARGV[0];
 
 my $daemon;
+my $daemonized;
 if ($i_am_a_daemon) {
     # help the poor souls, in controlling the daemon
     say '';
@@ -38,7 +39,8 @@ if ($i_am_a_daemon) {
                                  child_STDOUT => 'fulla.stdout',
                                  child_STDERR => 'fulla.stderr',
                                );
-    $daemon->Init();
+    $daemon->Init(); # parent dies here, child goes on
+    $daemonized = 1;
 }
 
 # setting up logger config
@@ -160,8 +162,9 @@ while($continue)
  
 # always clean up your room
 END {
-    $log->info('bye bye') if $log;
-    $socket->close()      if $socket;
+    $log->info('bye bye')   if $log;
+    $socket->close()        if $socket;
+    unlink '/tmp/fulla.pid' if ($daemonized);
 }
 
 # Some helpfull links on how to write a TCP application #
