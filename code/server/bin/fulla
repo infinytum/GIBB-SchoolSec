@@ -32,7 +32,6 @@ my $i_am_a_daemon = 1;
    $i_am_a_daemon = 0 if defined $ARGV[0];
 
 my $daemon;
-my $daemonized;
 if ($i_am_a_daemon) {
     # help the poor souls, in controlling the daemon
     say '';
@@ -49,7 +48,6 @@ if ($i_am_a_daemon) {
                                  child_STDERR => 'fulla.stderr',
                                );
     $daemon->Init(); # parent dies here, child goes on
-    $daemonized = 1;
 }
 
 # setting up logger config
@@ -114,20 +112,20 @@ $log->info('server waiting for client connection on port 7777');
 # this variable controls the main loop of the process
 my $continue = 1;
 
-# signal handlers for terminating the process
-$SIG{'INT'} = sub { $log->info('ctrl+c pressed') if $log;
-                    $socket->close()             if $socket;
-                    $continue = 0;
-                  };
-$SIG{TERM}  = sub { $log->info('I got killed')   if $log;
-                    $socket->close()             if $socket;
-                    $continue = 0;
-                  };
+# signal handlers for terminating the process / ending the loop
+$SIG{INT}  = sub { $log->info('ctrl+c pressed') if $log;
+                   $continue = 0;
+                   $socket->close()             if $socket;
+                 };
+$SIG{TERM} = sub { $log->info('I got killed')   if $log;
+                   $continue = 0;
+                   $socket->close()             if $socket;
+                 };
 
 # any incoming IP must have had at least one second pause
 my $dos = Fulla::Dos->new(min_pause => 1);
 
-# endless loop, looking for client requests
+# endless loop, looking for client requests (see handlers below for termination)
 while($continue)
 {
     # waiting for a new client connection
@@ -169,11 +167,14 @@ while($continue)
     $log->info("request from $client_address:$client_port answered");
 }
  
-# always clean up your room
+# clean up: last things to do before shutdown
+unlink $pid_file if (-f $pid_file);
+$log->info('bye bye');
+
 END {
-    $log->info('bye bye')   if $log;
-    $socket->close()        if $socket;
-    unlink $pid_file        if ($daemonized);
+    # the END block also gets called during the daemonization steps, because the
+    # parent gets terminated. This means you would need to double check in which
+    # context you are. This is why cleanup code was moved to outside this block.
 }
 
 # Some helpfull links on how to write a TCP application #
