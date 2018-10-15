@@ -28,11 +28,10 @@ if ( -f $pid_file ) {
 }
 
 # are we a daemon? If any argument is given, we DON'T daemonize
-my $i_am_a_daemon = 1;
-   $i_am_a_daemon = 0 if defined $ARGV[0];
-
-my $daemon;
+my $i_am_a_daemon = defined $ARGV[0] ? 0 : 1;
 my $i_am_a_worker;
+my $daemon;
+
 if ($i_am_a_daemon) {
     # help the poor souls, in controlling the daemon
     say '';
@@ -68,11 +67,10 @@ my $log = Log::Log4perl->get_logger();
 # since we have a logger, we can say that we have started :-)
 $log->info('starting server');
 
-# log process id
+# log process id if daemon
 if ($i_am_a_daemon) {
     my ($pid, $pid_file) = $daemon->get_pid();
-    $log->info('process id '      . $pid);
-    $log->info('process id file ' . $pid_file);
+    $log->info('running as daemon, process id ' . $pid . ' in '. $pid_file);
 }
 else {
     $log->info('not running as daemon, argv is: ' . join(', ', @ARGV));
