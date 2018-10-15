@@ -145,11 +145,11 @@ while($continue)
 
     # don't answer dos attacks
     if ($dos->check($client_address)) {
-		$log->warn("client blocked: $client_address:$client_port");
+        $log->warn("client blocked: $client_address:$client_port");
         print $client_socket "00000000000000000000 dos from $client_address";
         shutdown($client_socket, 1);
         next;
-	}
+    }
 
     # read up to 1024 characters from the connected client
     my $client_data = '';
