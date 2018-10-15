@@ -32,6 +32,7 @@ my $i_am_a_daemon = 1;
    $i_am_a_daemon = 0 if defined $ARGV[0];
 
 my $daemon;
+my $i_am_a_worker;
 if ($i_am_a_daemon) {
     # help the poor souls, in controlling the daemon
     say '';
@@ -49,6 +50,9 @@ if ($i_am_a_daemon) {
                                );
     $daemon->Init(); # parent dies here, child goes on
 }
+
+# if here, we are either a surviving daemon child or running in foreground
+$i_am_a_worker = 1;
 
 # setting up logger config
 my $log_config = { level  => $DEBUG,
@@ -115,17 +119,17 @@ my $continue = 1;
 # signal handlers for terminating the process / ending the loop
 $SIG{INT}  = sub { $log->info('ctrl+c pressed') if $log;
                    $continue = 0;
-                   $socket->close()             if $socket;
+                   $socket->close()             if $socket; # ends accept()
                  };
 $SIG{TERM} = sub { $log->info('I got killed')   if $log;
                    $continue = 0;
-                   $socket->close()             if $socket;
+                   $socket->close()             if $socket; # ends accept()
                  };
 
 # any incoming IP must have had at least one second pause
 my $dos = Fulla::Dos->new(min_pause => 1);
 
-# endless loop, looking for client requests (see handlers below for termination)
+# endless loop, looking for client requests (see handlers above for termination)
 while($continue)
 {
     # waiting for a new client connection
@@ -168,13 +172,18 @@ while($continue)
 }
  
 # clean up: last things to do before shutdown
-unlink $pid_file if (-f $pid_file);
-$log->info('bye bye');
-
 END {
     # the END block also gets called during the daemonization steps, because the
-    # parent gets terminated. This means you would need to double check in which
-    # context you are. This is why cleanup code was moved to outside this block.
+    # parent gets terminated. This means you need to double check in which
+    # context you are.
+    # We still want to do the clean up in the END block, in case the server dies
+    # somewhere unexpected.
+    if ($i_am_a_worker) {
+        $log->info('cleaning up') if $log;
+        $socket->close()          if $socket;
+        unlink $pid_file          if (-f $pid_file);
+        $log->info('bye bye')     if $log;
+    }
 }
 
 # Some helpfull links on how to write a TCP application #
