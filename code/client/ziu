@@ -6,6 +6,12 @@ use File::Slurp;
 # auto-flush on socket
 $| = 1;
 
+# user running this script
+my $username = getpwuid( $< );
+
+# session cookie
+my $cookie = "/tmp/ziu_session_$username.txt";
+
 # create a connecting socket
 my $socket = new IO::Socket::INET (
     PeerHost    => '127.0.0.1',
@@ -16,8 +22,8 @@ die "cannot connect to the server $!\n" unless $socket;
 
 # if old session exists load it, otherwise session is zero
 my $session_id = '00000000000000000000';
-if ( -e '/tmp/ziu_session.txt' ) {
-    $session_id = read_file( '/tmp/ziu_session.txt' ) ;
+if ( -e $cookie ) {
+    $session_id = read_file( $cookie ) ;
 }
  
 # send data in ARGV to server with session-id attached
@@ -48,7 +54,7 @@ say $response;
 # need to fix this buggy http in the session :-)
 unless ($session_id =~ /http/i) {
     # save session-id in file, for later connections
-    open(my $fh, '>', '/tmp/ziu_session.txt');
+    open(my $fh, '>', $cookie);
     print $fh $session_id;
     close $fh;
 }
