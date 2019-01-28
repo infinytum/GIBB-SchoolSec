@@ -2,6 +2,9 @@
 use v5.22;
 use IO::Socket::INET;
 use File::Slurp;
+
+# print manual and exit if first argument suggests it
+say join '', <DATA> and exit 0 if (shift =~ /^(-h|--help)$/);
  
 # auto-flush on socket
 $| = 1;
@@ -65,7 +68,7 @@ unless ($session_id =~ /http/i) {
 # https://metacpan.org/pod/IO::Socket::INET
 # https://metacpan.org/pod/IO::Socket::SSL
 
-__END__
+=pod
 
 =encoding UTF-8
 
@@ -85,8 +88,65 @@ C<ziu> takes any arguments, attaches a session-id and sends this as a request to
  
 =head1 COMMANDS
  
-See the man-page for command details.
+Use argument C<--help> for command details.
  
 =head1 AUTHOR
  
-© Boris Däppen, Biel, 2017
+© Boris Däppen, Biel, 2017-2019
+
+=cut
+
+__END__
+AUFRUF
+       Die  folgenden Kommandos können dem Programm ziu als Argu‐
+       mente mitgegeben werden:
+
+       login USER PW
+           Eröffnen einer Session.
+           Ohne Session können keine andere  Kommandos  verwendet
+           werden.
+
+       register USER PW
+           Erstellt einen neuen Applikationsbenutzer.
+
+       logout
+           Beenden der aktuellen Session.
+
+       ping
+           Schickt eine Testnachricht an den Server.
+
+       artikel [MUSTER]
+           Gibt  eine  Liste  von Artikeln zurück welche optional
+           MUSTER im Namen enthalten.
+
+       neuerartikel NAME ANZAHL PREIS
+           Erstell einen neuen Artikel in der Datenbank.
+
+       loescheartikel ID
+           Löscht  einen  Artikel  aus  der  Datenbank.  Achtung:
+           Löscht  nur, wenn keine anderen Tabellen-Einträge
+           referenziert werden,  also  noch  keine  Käufe  auf
+           dem Artikel gemacht wurden.
+
+       list [OPTIONEN]
+           Zeigt Dateien im Heimverzeichnis an.
+           Akzeptiert alle OPTIONEN des Linux-Kommandos ls.
+
+       http
+           Liefert  Daten zu Artikeln in HTML als HTTP-Anwort. Es
+           wird hierfür kein Login benötigt! Ein  gängiger
+           Internetbrowser kann so vom Server Daten empfangen.
+
+BEISPIELE
+       ziu login hans muster
+
+       ziu ping
+
+       ziu artikel k
+
+KONFIGURATION
+       Session-Daten  werden  unter  /tmp/ziu_session_$user.txt
+       gespeichert.
+
+AUTOR
+       Boris Däppen <bdaeppen.perl@gmail.com>
