@@ -13,5 +13,5 @@ fi
 
 echo 'POSTINST: befülle Datenbank...'
 
-mysql -uvmadmin -ph4cker < /usr/share/fulla/db.sql
+mysql -uvmadmin -ph4cker < /usr/share/fulladb/db.sql
 
