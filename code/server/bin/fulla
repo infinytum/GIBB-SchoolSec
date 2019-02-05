@@ -79,7 +79,7 @@ else {
 # setting up DB connection
 my $dbh = DBI->connect( 'DBI:mysql:database=fulla;host=localhost;',
                         'root',
-                        'gibbiX12345',
+                        'h4cker',
                       );
 if ($dbh) {
     $log->info('db connection established');
