@@ -4,7 +4,7 @@ use IO::Socket::INET;
 use File::Slurp;
 
 # print manual and exit if first argument suggests it
-say join '', <DATA> and exit 0 if (shift =~ /^(-h|--help)$/);
+say join '', <DATA> and exit 0 if ($ARGV[0] =~ /^(-h|--help)$/);
  
 # auto-flush on socket
 $| = 1;
