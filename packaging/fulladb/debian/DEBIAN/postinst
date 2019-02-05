@@ -15,3 +15,9 @@ echo 'POSTINST: befülle Datenbank...'
 
 mysql -uvmadmin -ph4cker < /usr/share/fulladb/db.sql
 
+# Hotfix for missing libfunction-parameters-perl
+#wget https://cpan.metacpan.org/authors/id/M/MA/MAUKE/Function-Parameters-2.001003.tar.gz
+#tar -xzvf Function-Parameters-2.001003.tar.gz -C /usr/share/perl5/
+echo 'Installiere unter Ubuntu fehlendes Perl-Paket...'
+cpan install App::cpanminus
+cpanm Function::Parameters
