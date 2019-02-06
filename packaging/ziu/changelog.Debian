@@ -1,3 +1,10 @@
+ziu (0.5) UNRELEASED; urgency=medium
+
+  * accept --help option
+  * session file per user
+
+ -- Boris Däppen <bdaeppen.perl@gmail.com>  Wed, 06 May 2019 06:37:51 +0200
+
 ziu (0.4) UNRELEASED; urgency=medium
 
   * Empty session numer is now 20 times a zero
