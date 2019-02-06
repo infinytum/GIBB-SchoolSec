@@ -1,7 +1,7 @@
 SET NAMES 'utf8';
-DROP DATABASE IF EXISTS fulla_test;
-CREATE DATABASE fulla_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE fulla_test;
+DROP DATABASE IF EXISTS fulla;
+CREATE DATABASE fulla CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE fulla;
 
 CREATE TABLE artikel (
     id INTEGER NOT NULL AUTO_INCREMENT,
