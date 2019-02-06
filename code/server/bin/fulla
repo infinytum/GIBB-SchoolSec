@@ -107,8 +107,8 @@ my $socket = new IO::Socket::INET (
     Listen        => 5,             # queue size for connections
     Proto         => 'tcp',         # protocol used
 );
-$log->fatal("cannot create socket $!") unless $socket;
-die         "cannot create socket $!"  unless $socket;
+$log->fatal("Is already a server instance running? $!") unless $socket;
+die         "cannot create socket $!"                   unless $socket;
 $log->info('server waiting for client connection on port 7777');
 
 # this variable controls the main loop of the process
