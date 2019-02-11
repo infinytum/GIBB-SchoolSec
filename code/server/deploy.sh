@@ -14,4 +14,4 @@ ssh $user@$server 'chmod    755 /usr/bin/fulla;\
                    chmod -R u=rwX,go=rX /usr/share/perl5/HTML'
 
 # restart application
-ssh $user@$server 'cd /home/vmadmin; pkill -F fulla.pid; /usr/bin/fulla'
+ssh $user@$server 'cd /home/vmadmin; pkill -F pid.fulla; /usr/bin/fulla'
