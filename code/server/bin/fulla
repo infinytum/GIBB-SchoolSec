@@ -36,9 +36,10 @@ if ($i_am_a_daemon) {
     # help the poor souls, in controlling the daemon
     say '';
     say "\tHi, I'm a daemon\n";
-    say "\tkill me:\t\tpkill -F $pid_file";
-    say "\twatch me:\t\ttail -f fulla.*";
-    say "\tdon't run me as daemon:\tfulla test";
+    say "\tfind me:\t\tpgrep -fa fulla";
+    say "\tkill me:\t\tpkill -F  $pid_file";
+    say "\twatch me:\t\ttail  -f  fulla.*";
+    say "\tdon't run me as daemon:\tfulla  fg";
     say '';
 
     # daemonize process
