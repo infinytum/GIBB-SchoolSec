@@ -1,5 +1,5 @@
 # connection parameters
-server='192.168.220.12'
+server='192.168.0.104'
 user='root'
 
 # deploy updated files
@@ -14,4 +14,4 @@ ssh $user@$server 'chmod    755 /usr/bin/fulla;\
                    chmod -R u=rwX,go=rX /usr/share/perl5/HTML'
 
 # restart application
-ssh $user@$server 'cd /home/vmadmin; pkill -F pid.fulla; /usr/bin/fulla'
+ssh $user@$server 'pkill -F /tmp/fulla.pid; /usr/bin/fulla'
