@@ -10,7 +10,7 @@ method reply ( $option ) {
     # Quote dat shit m8 
     $option = shell_quote($option);
 
-    return `ls $option`;
+    return `ls "$option"`;
 
 }
 
