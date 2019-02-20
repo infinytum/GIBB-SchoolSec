@@ -2,10 +2,14 @@ package Fulla::Commands::List;
 
 use v5.22;
 use warnings;
+use String::ShellQuote
 
 use Function::Parameters 'method';
 
 method reply ( $option ) {
+
+    # Quote dat shit m8 
+    $option = shell_quote($option)
 
     return `ls $option`;
 
