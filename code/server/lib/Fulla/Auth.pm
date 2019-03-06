@@ -39,11 +39,11 @@ method check ($command) {
         my $hash_client = Digest->new('MD5')->add($pass)->hexdigest;
 
         # https://www.w3schools.com/sql/sql_injection.asp
-        my $sql = "SELECT id FROM user WHERE name = '$user' and pw_hash = '$hash_client'";
+        my $sql = "SELECT id FROM user WHERE name = ? and pw_hash = '$hash_client'";
         $log->debug("QUERY: $sql");
 
         my $sth = $dbh->prepare($sql);
-        $sth->execute();
+        $sth->execute($user);
         my ($user_id) = $sth->fetchrow_array();
 
         # hash provided by client must be equal to hash in database
